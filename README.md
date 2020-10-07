@@ -37,6 +37,9 @@ A little hack by renaming file as "WirelessFilsPilotes.v1.3.4-3.4.5.WFP1.bin" fo
 
 Well, after upload it, wait some seconds and Homeassistant will discover it automaticaly. Great, you have a new device completely integrated with Homeassistant !
 
+
+![Homeassistant](https://github.com/cbijon/ESPHOME-DOMOCHIP-WFP1/blob/main/images/homeassistant.jpg)
+
 Enjoy !
 
 

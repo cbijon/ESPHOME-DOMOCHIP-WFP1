@@ -13,7 +13,7 @@ After find too complexe for the HA integration and  i am lover coding MCU  (Ardu
 
 The WFP1 module use an ESP8266. It's very generic and you can find this easly to code. This module generates differents signals to drive heater with six modes on "pilot wire".
 
-![The WFP1 module](https://github.com/cbijon/ESPHOME-DOMOCHIP-WFP1/blob/master/images/module.jpg)
+![The WFP1 module](https://github.com/cbijon/ESPHOME-DOMOCHIP-WFP1/blob/main/images/module.jpg)
 
 Ok, don't need to open it, we have [sources] (https://github.com/Domochip/WirelessFilsPilotes/blob/master/src/WirelessFilsPilotes.cpp) ! We can learn everythings... You can see my code.
 
@@ -24,7 +24,7 @@ In fact i didn't implement MQTT and OneWire setup, useless for my requirement.
 I have in my toolbox some cool stuff to help the new baby : [Wemos D1 mini](https://s.click.aliexpress.com/e/_d8l72oB) very cheap MCU et completly similar as the inside of WFP1 module. I can setup and test code without explode the WFP1 module.
 
 
-![The WFP1 module](https://github.com/cbijon/ESPHOME-DOMOCHIP-WFP1/blob/master/images/simulation.jpg)
+![The WFP1 module](https://github.com/cbijon/ESPHOME-DOMOCHIP-WFP1/blob/main/images/simulation.jpg)
 
 
 ## Play it :

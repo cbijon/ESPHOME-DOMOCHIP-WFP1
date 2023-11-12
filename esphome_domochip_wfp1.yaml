@@ -1,34 +1,40 @@
-## ESPhome firmware for DOMOCHIP WFP1 for Homeassistant integration
-
+# Insert your SSID and Your PWD after initial setup
 wifi:
-  #use_address: radiateur_chambre_enfants.local # for setup only when you want to change devicename
-  networks:
-    - ssid: !secret wifi_ssid          # Uncomment this line (remove # at beginning of line) and enter your details in secrets.yaml file!
-      password: !secret wifi_password  # Uncomment this line (remove # at beginning of line) and enter your details in secrets.yaml file!
-  ap:
-    ssid: ${devicename}
-  fast_connect: true
+  # Use the following line for setup only when you want to change the device name
+  # use_address: 10.7.4.7
 
+  # Define your Wi-Fi network credentials in the secrets.yaml file
+  networks:
+    - ssid: !secret wifi_ssid          # Uncomment and specify your Wi-Fi SSID in secrets.yaml
+      password: !secret wifi_password  # Uncomment and specify your Wi-Fi password in secrets.yaml
+
+  # Access Point (AP) settings
+  ap:
+    ssid: ${devicename}  # SSID for the AP
+  fast_connect: true     # Enable fast connect for Wi-Fi
+
+# Captive Portal for configuration (if needed)
 captive_portal:
 
+# Define substitutions for device name and friendly name
 substitutions:
-  devicename: "Radiateur bureau"
-  friendly_name: "Radiateur bureau"
+  devicename: "Radiateur salon"   # Device name for identification
+  friendly_name: "Radiateur salon"  # Friendly name for display
 
+# Main ESPHome configuration
 esphome:
-  name: radiateur_bureau # used for network identification with myDNS
-  platform: ESP8266
-  board: d1_mini
+  name: radiateur_salon   # Name used for network identification with myDNS
+  platform: ESP8266        # Target platform
+  board: d1_mini           # Board type (in this case, a Wemos D1 Mini)
 
-
-# api connection success init led + mode
-  on_boot:
-    priority: -10
-    then:
+# Define actions to run on boot
+on_boot:
+  priority: -10
+  then:
     - wait_until:
-        api.connected:
-    - logger.log: API is connected!
-    - output.turn_on: led_green
+        api.connected:   # Wait until the Home Assistant API is connected
+    - logger.log: API is connected!  # Log a message indicating API connection
+    - output.turn_on: led_green  # Turn on the green LED
     - switch.turn_off: mode_confort_1_enabled
     - switch.turn_off: mode_confort_1_enabled
     - switch.turn_off: mode_confort_2_enabled
@@ -36,19 +42,24 @@ esphome:
     - switch.turn_off: mode_hors_gel_enabled
     - switch.turn_on: arret_enabled
 
-# FilsPilotes States D1 - D2 :
-# Arrêt:    LOW  - HIGH 
-# Hors Gel: HIGH - LOW  
-# Eco :     LOW  - LOW  
-# Confort - 2: HIGH - HIGH / LOW - LOW + signal ticker inverter 4m53s / 7s
-# Confort - 1: HIGH - HIGH / LOW - LOW + signal ticker inverter 4m57s / 3s
-# Confort : HIGH - HIGH 
+# Web server configuration with authentication
+web_server:
+  port: 80
+  version: 2
+  include_internal: true
+  auth:
+    username: admin
+    password: xxxxxx
 
-# Define switches to control position from HA
-# Ok, i think we can do this better, but it works for me
+# Sync time with Home Assistant.
+time:
+  - platform: sntp
+    id: homeassistant_time
+  
+# Define switches to control different heating modes
 switch:
   - platform: template
-    name: "${friendly_name} Mode confort"
+    name: "${friendly_name} Mode confort"   # Comfort mode
     id: mode_confort_enabled
     icon: mdi:weather-sunny
     optimistic: true
@@ -64,9 +75,9 @@ switch:
     on_turn_off:
       then:
         - switch.turn_on: arret_enabled
-        
+
   - platform: template
-    name: "${friendly_name} Mode confort -1"
+    name: "${friendly_name} Mode confort -1"  # Comfort -1 mode
     id: mode_confort_1_enabled
     icon: mdi:numeric-1-box-outline
     optimistic: true
@@ -82,8 +93,9 @@ switch:
     on_turn_off:
       then:
         - switch.turn_on: arret_enabled
+
   - platform: template
-    name: "${friendly_name} Mode confort -2"
+    name: "${friendly_name} Mode confort -2"  # Comfort -2 mode
     id: mode_confort_2_enabled
     icon: mdi:numeric-2-box-outline
     optimistic: true
@@ -99,8 +111,9 @@ switch:
     on_turn_off:
       then:
         - switch.turn_on: arret_enabled
+
   - platform: template
-    name: "${friendly_name} Mode Eco"
+    name: "${friendly_name} Mode Eco"   # Eco mode
     id: mode_eco_enabled
     icon: mdi:cash-usd
     optimistic: true
@@ -116,8 +129,9 @@ switch:
     on_turn_off:
       then:
         - switch.turn_on: arret_enabled
+
   - platform: template
-    name: "${friendly_name} Mode Hors Gel"
+    name: "${friendly_name} Mode Hors Gel"   # Frost protection mode
     id: mode_hors_gel_enabled
     icon: mdi:weather-snowy
     optimistic: true
@@ -133,8 +147,9 @@ switch:
     on_turn_off:
       then:
         - switch.turn_on: arret_enabled
+
   - platform: template
-    name: "${friendly_name} Arrêt"
+    name: "${friendly_name} Arrêt"   # Stop mode
     id: arret_enabled
     icon: mdi:stop
     optimistic: true
@@ -154,14 +169,10 @@ api:
 # Enable logging
 logger:
 
+# OTA (Over-the-Air) updates
 ota:
 
-# OUTPUTs are :
-# GPIO14 - D5 : Green led
-# GPIO12 - D6 : Red Led
-# GPIO5  - D1 : FPA
-# GPIO4  - D2 : FPB
-
+# Define output pins for LEDs and heating modes
 output:
   # Green Led
   - platform: esp8266_pwm
@@ -173,13 +184,15 @@ output:
   - platform: esp8266_pwm
     pin: D2
     id: fpb
+
+# Define heating modes as binary switches
   - platform: template
     id: mode_confort
     type: binary
     write_action:
       - output.turn_on: fpa
       - output.turn_on: fpb
-  # beviahour can be special there.. i don't use it but it was for the sport..
+
   - platform: template
     id: mode_confort_1
     type: binary
@@ -194,7 +207,7 @@ output:
             - output.turn_on: fpa
             - output.turn_on: fpb
             - delay: 297000 ms
-  # beviahour can be special there.. i don't use it but it was for the sport..
+
   - platform: template
     id: mode_confort_2
     type: binary
@@ -209,18 +222,21 @@ output:
             - output.turn_on: fpa
             - output.turn_on: fpb
             - delay: 293000 ms
+
   - platform: template
     id: mode_eco
     type: binary
     write_action:
       - output.turn_off: fpa
       - output.turn_off: fpb
+
   - platform: template
     id: mode_hors_gel
     type: binary
     write_action:
       - output.turn_on: fpa
       - output.turn_off: fpb
+
   - platform: template
     id: arret
     type: binary
@@ -231,3 +247,35 @@ output:
 # Red led for booting / flash / errors / issues
 status_led: 
     pin: D6
+    
+# Sensor configuration
+sensor:
+  # Reports the WiFi signal strength
+  - platform: wifi_signal
+    name: Signal
+    update_interval: 60s
+  # Reports how long the device has been powered (in minutes)
+  - platform: uptime
+    name: Uptime
+    filters:
+      - lambda: return x / 60.0;
+    unit_of_measurement: minutes
+
+text_sensor:
+  - platform: version
+    name: ESPHome Version
+  - platform: wifi_info
+    ip_address:
+      name: IP Address
+    ssid:
+      name: Connected SSID
+    bssid:
+      name: Connected BSSID
+    mac_address:
+      name: Mac Wifi Address
+    scan_results:
+      name: Latest Scan Results
+
+button:
+  - platform: restart
+    name: "Restart Device"
